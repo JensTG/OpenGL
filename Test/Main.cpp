@@ -60,12 +60,20 @@ int main() {
 		processInput(window);
 
 		// ----------- Render -----------
-		// Vertex shader:
+		glClear(GL_COLOR_BUFFER_BIT);
+		// Linking vertex attributes and VAO:
+		unsigned int VAO;
+		glGenVertexArrays(1, &VAO);
 		unsigned int VBO;
 		glGenBuffers(1, &VBO);
+
+		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
 
+		// Vertex shader:
 		unsigned int vertexShader;
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -105,10 +113,13 @@ int main() {
 			std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
 			return -1;
 		}
-
-		glUseProgram(shaderProgram);
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
+
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 
 		// ----------- Events and bufferswapping -----------
 		glfwSwapBuffers(window);
