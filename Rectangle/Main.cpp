@@ -16,19 +16,25 @@ const char* vertexShaderSource = "#version 330 core\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
-const char* fragmentShaderSources[2] =
+const char* fragmentShaderSources[] =
 {
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(0.79f, 0.47f, 0.68f, 1.0f);\n"
 "}\n\0",
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+"   FragColor = vec4(0.81f, 0.89f, 0.85f, 1.0f);\n"
+"}\n\0",
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(0.49f, 0.39f, 0.31f, 1.0f);\n"
 "}\n\0"
 };
 
@@ -64,25 +70,36 @@ int main()
 
     // Compile shaders:
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int fragmentShaders[2] = { glCreateShader(GL_FRAGMENT_SHADER), glCreateShader(GL_FRAGMENT_SHADER) };
-    unsigned int shaderPrograms[2] = { glCreateProgram(), glCreateProgram() }; // Must not be initiated with the same glCreateProgram()
+    unsigned int fragmentShaders[3] = { glCreateShader(GL_FRAGMENT_SHADER), glCreateShader(GL_FRAGMENT_SHADER), glCreateShader(GL_FRAGMENT_SHADER) };
+    unsigned int shaderPrograms[3] = { glCreateProgram(), glCreateProgram(), glCreateProgram()}; // Must not be initiated with the same glCreateProgram()
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
-    float triangles[2][9] = {
-        -0.9f, -0.5f, 0.0f,  // left 
-        -0.0f, -0.5f, 0.0f,  // right
-        -0.45f, 0.5f, 0.0f,  // top 
-        0.0f, -0.5f, 0.0f,  // left
-        0.9f, -0.5f, 0.0f,  // right
-        0.45f, 0.5f, 0.0f   // top 
+    float triangles[] = {
+        -0.6f, -0.5f, 0.0f,
+        -0.6f, 0.5f, 0.0f,
+        -0.2f, -0.5f, 0.0f,
+        -0.2f, 0.5f, 0.0f,
+        0.2f, -0.5f, 0.0f,
+        0.2f, 0.5f, 0.0f,
+        0.6f, -0.5f, 0.0f,
+        0.6f, 0.5f, 0.0f
+    };
+    unsigned int indices[3][6] = {
+        2, 0, 1,
+        2, 1, 3,
+        4, 2, 3,
+        4, 3, 5,
+        6, 4, 5,
+        6, 5, 7
     };
 
-    unsigned int VBOs[2], VAOs[2];
-    glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
-    glGenBuffers(2, VBOs);
+    unsigned int VBOs[3], VAOs[3], EBOs[3];
+    glGenVertexArrays(3, VAOs); // we can also generate multiple VAOs or buffers at the same time
+    glGenBuffers(3, VBOs);
+    glGenBuffers(3, EBOs);
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         glShaderSource(fragmentShaders[i], 1, &fragmentShaderSources[i], NULL);
         glCompileShader(fragmentShaders[i]);
 
@@ -91,11 +108,14 @@ int main()
         glLinkProgram(shaderPrograms[i]);
 
         glBindVertexArray(VAOs[i]);
+
         glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(triangles[i]), triangles[i], GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
+        glBufferData(GL_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[i]), indices[i], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
-        glBindVertexArray(0);
     }
 
     // uncomment this call to draw in wireframe polygons.
@@ -111,10 +131,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        for (int i = 0; i < 2; i++) {
+
+        for (int i = 0; i < 3; i++) {
             glUseProgram(shaderPrograms[i]);
             glBindVertexArray(VAOs[i]);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
