@@ -16,8 +16,8 @@ const char* vertexShaderSource = "#version 330 core\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
-const char* fragmentShaderSources[2] = 
-{ 
+const char* fragmentShaderSources[2] =
+{
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
@@ -29,7 +29,7 @@ const char* fragmentShaderSources[2] =
 "void main()\n"
 "{\n"
 "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-"}\n\0" 
+"}\n\0"
 };
 
 
@@ -116,7 +116,7 @@ int main()
             glBindVertexArray(VAOs[i]);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-        
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -135,10 +135,10 @@ int main()
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height);
 }
 
 void processInput(GLFWwindow* window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }

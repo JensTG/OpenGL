@@ -21,10 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{175a5f04-f272-4d85-a045-8adefa4baa91}</ProjectGuid>
-    <RootNamespace>Test</RootNamespace>
+    <ProjectGuid>{be615df6-833b-431f-a8fc-6a59920a5c78}</ProjectGuid>
+    <RootNamespace>ShaderTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Triangles</ProjectName>
+    <ProjectName>Rectangle</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
