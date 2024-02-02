@@ -22,19 +22,19 @@ const char* fragmentShaderSources[] =
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.79f, 0.47f, 0.68f, 1.0f);\n"
+"   FragColor = vec4(0.0f, 0.57f, 0.27f, 1.0f);\n"
 "}\n\0",
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.81f, 0.89f, 0.85f, 1.0f);\n"
+"   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
 "}\n\0",
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.49f, 0.39f, 0.31f, 1.0f);\n"
+"   FragColor = vec4(0.81f, 0.17f, 0.24f, 1.0f);\n"
 "}\n\0"
 };
 
@@ -50,7 +50,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Trefarvet Is", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -128,7 +128,7 @@ int main()
         processInput(window);
 
         // Render:
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
 
