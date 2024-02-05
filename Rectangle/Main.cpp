@@ -2,6 +2,8 @@
 #include <glfw3.h>
 
 #include <iostream>
+#include <vector>
+using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -75,7 +77,8 @@ int main()
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
-    float triangles[] = {
+    vector<float> triangles = 
+    {
         -0.6f, -0.5f, 0.0f,
         -0.6f, 0.5f, 0.0f,
         -0.2f, -0.5f, 0.0f,
@@ -85,7 +88,8 @@ int main()
         0.6f, -0.5f, 0.0f,
         0.6f, 0.5f, 0.0f
     };
-    unsigned int indices[3][6] = {
+    unsigned int indices[3][6] = 
+    {
         2, 0, 1,
         2, 1, 3,
         4, 2, 3,
@@ -110,7 +114,7 @@ int main()
         glBindVertexArray(VAOs[i]);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, triangles.size() * sizeof(float), triangles.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[i]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[i]), indices[i], GL_STATIC_DRAW);
 

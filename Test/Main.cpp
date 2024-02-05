@@ -2,6 +2,7 @@
 #include <glfw3.h>
 
 #include <iostream>
+#include <shader.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -9,29 +10,6 @@ void processInput(GLFWwindow* window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char* fragmentShaderSources[2] = 
-{ 
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0",
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-"}\n\0" 
-};
-
 
 int main()
 {
@@ -61,13 +39,11 @@ int main()
         return -1;
     }
 
-
-    // Compile shaders:
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int fragmentShaders[2] = { glCreateShader(GL_FRAGMENT_SHADER), glCreateShader(GL_FRAGMENT_SHADER) };
-    unsigned int shaderPrograms[2] = { glCreateProgram(), glCreateProgram() }; // Must not be initiated with the same glCreateProgram()
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
+    Shader programs[2] = 
+    { 
+        Shader("C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\directVertex.txt", "C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\redFragment.txt"), 
+        Shader("C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\directVertex.txt", "C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\yellowFragment.txt")
+    };
 
     float triangles[2][9] = {
         -0.9f, -0.5f, 0.0f,  // left 
@@ -83,13 +59,6 @@ int main()
     glGenBuffers(2, VBOs);
 
     for (int i = 0; i < 2; i++) {
-        glShaderSource(fragmentShaders[i], 1, &fragmentShaderSources[i], NULL);
-        glCompileShader(fragmentShaders[i]);
-
-        glAttachShader(shaderPrograms[i], vertexShader);
-        glAttachShader(shaderPrograms[i], fragmentShaders[i]);
-        glLinkProgram(shaderPrograms[i]);
-
         glBindVertexArray(VAOs[i]);
         glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(triangles[i]), triangles[i], GL_STATIC_DRAW);
@@ -112,7 +81,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         for (int i = 0; i < 2; i++) {
-            glUseProgram(shaderPrograms[i]);
+            programs[i].use();
             glBindVertexArray(VAOs[i]);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
@@ -126,8 +95,8 @@ int main()
     // De-allocate all resources:
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
-    glDeleteProgram(shaderPrograms[0]);
-    glDeleteProgram(shaderPrograms[1]);
+    glDeleteProgram(programs[0].ID);
+    glDeleteProgram(programs[1].ID);
 
     // Clear all previously allocated GLFW resources:
     glfwTerminate();
