@@ -2,7 +2,7 @@
 #include <glfw3.h>
 
 #include <iostream>
-#include <OpenGL/shader.h>
+#include <shader.h>
 #include <vector>
 using namespace std;
 
@@ -43,7 +43,7 @@ int main()
     }
 
     // -------------------- Setup --------------------
-    Shader program("C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\colorVertex.txt", "C:\\VSC_PRO_B\\Tools\\Include\\OpenGL\\Shaders\\ourColorFragment.txt");
+    Shader program("C:\\VSC_PRO_B\\Tools\\Shaders\\colorVertex.txt", "C:\\VSC_PRO_B\\Tools\\Shaders\\ourColorFragment.txt");
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -62,6 +62,8 @@ int main()
         // Render:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        count = (int)(sin(glfwGetTime()) * 10) + 13;
 
         vector<float> vertices;
         vector<unsigned int> indices;
@@ -111,10 +113,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window, int* count) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        *count = *count + 1;
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        *count = *count > 3 ? *count - 1 : 3;
 }
 
 float degToRad(float deg)
