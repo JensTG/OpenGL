@@ -13,14 +13,16 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 vector <float> vertices =
-{   // Position             Color           Texture
-    -0.5f, -0.433f, 0.0f,
-     0.0f,  0.433f, 0.0f,
-     0.5f, -0.433f, 0.0f
+{   // Position           Color                 Texture
+    -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,     0.0f, 0.0f,
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f, 0.0f,     0.0f, 1.0f,
+     0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,     1.0f, 1.0f
 };
 vector<unsigned int> indices =
 {
-    0, 1, 2
+    0, 1, 2,
+    1, 3, 2
 };
 
 int main()
@@ -66,9 +68,14 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), (void*) vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), (void*)indices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // -------------------- Rendering --------------------
     while (!glfwWindowShouldClose(window))
