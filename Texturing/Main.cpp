@@ -4,6 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <shader.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -53,14 +56,15 @@ int main()
         return -1;
     }
 
+    // Create shape:
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
     Shader program(
-        "C:\\VSC_PRO_B\\Tools\\Shaders\\directVertex.txt",
-        "C:\\VSC_PRO_B\\Tools\\Shaders\\redFragment.txt"
+        "C:/VSC_PRO_B/OpenGL/resources/Shaders/textureVertex.txt",
+        "C:/VSC_PRO_B/OpenGL/resources/Shaders/textureFragment.txt"
     );
 
     glBindVertexArray(VAO);
@@ -74,8 +78,29 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
+    // -------------------- Texture --------------------
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width; int height; int nrChannels;
+    unsigned char* data = stbi_load("C:/VSC_PRO_B/OpenGL/resources/Textures/red_brick_wall.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        cout << data << endl;
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 
     // -------------------- Rendering --------------------
     while (!glfwWindowShouldClose(window))
@@ -88,6 +113,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         program.use();
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
 

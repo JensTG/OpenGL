@@ -24,6 +24,7 @@
     <ProjectGuid>{a0546ba3-c645-4997-8b30-298fd5e91563}</ProjectGuid>
     <RootNamespace>TriangularCircle</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SinglePolygonWithTriangles</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
