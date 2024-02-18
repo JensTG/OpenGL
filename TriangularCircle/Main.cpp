@@ -43,7 +43,7 @@ int main()
     }
 
     // -------------------- Setup --------------------
-    Shader program("C:\\VSC_PRO_B\\Tools\\Shaders\\colorVertex.txt", "C:\\VSC_PRO_B\\Tools\\Shaders\\ourColorFragment.txt");
+    Shader program("C:\\VSC_PRO_B\\OpenGL\\resources\\shaders\\colorVertex.txt", "C:\\VSC_PRO_B\\OpenGL\\resources\\shaders\\ourColorFragment.txt");
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
