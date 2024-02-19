@@ -9,6 +9,7 @@
 
 #include <shader.h>
 #include <VAO.h>
+#include <renderfuncs.h>
 
 #include <iostream>
 #include <vector>
@@ -40,6 +41,8 @@ float speed = 1;
 float rot = 0;
 double prevTime = 0;
 
+vector<VAO> vaos;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -51,7 +54,7 @@ int main()
 
 	// glfw window creation
 	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Random Triangles", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Matricing", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -95,7 +98,7 @@ int main()
 		unsigned int transLoc = glGetUniformLocation(program.ID, "transform");
 		glUniformMatrix4fv(transLoc, 1, GL_FALSE, value_ptr(trans));
 
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_TRIANGLES, vao.indices.size(), GL_UNSIGNED_INT, NULL);
 
 		// Bufferswap and polling:
 		glfwSwapBuffers(window);
