@@ -27,10 +27,10 @@ const unsigned int SCR_HEIGHT = 600;
 
 vector<float> vertices =
 {
-	-0.5f,  0.5f,  0.0f,
-	 0.5f, -0.5f,  0.0f,
+	-0.8f,  0.5f,  0.0f,
+	 0.5f, -0.7f,  0.0f,
 	-0.5f, -0.5f,  0.0f,
-	 0.5f,  0.5f,  0.0f
+	 0.9f,  1.0f,  0.0f
 };
 vector<unsigned int> indices =
 {
@@ -73,8 +73,10 @@ int main()
 
 	Shader program("uniform", "ourColor");
 	VAO vao(vertices, indices);
-
 	program.use();
+
+	cout << "Largest: (" << largestCoord(vao, 0) << ", " << largestCoord(vao, 1) << ")" << endl;
+	cout << "Smallest: (" << smallestCoord(vao, 0) << ", " << smallestCoord(vao, 1) << ")" << endl;
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
