@@ -22,8 +22,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+int SCR_WIDTH = 800;
+int SCR_HEIGHT = 600;
 
 vector<float> vertices =
 {
@@ -75,8 +75,8 @@ int main()
 	VAO vao(vertices, indices);
 	program.use();
 
-	cout << "Largest: (" << largestCoord(vao, 0) << ", " << largestCoord(vao, 1) << ")" << endl;
-	cout << "Smallest: (" << smallestCoord(vao, 0) << ", " << smallestCoord(vao, 1) << ")" << endl;
+	vec2 worldSize = vec2(10.0f, 10.0f);
+	program.setVec2("worldSize", worldSize);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -89,16 +89,24 @@ int main()
 		// Render:
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		
 		program.use();
 		vao.bind();
 
+		// Creating a projection:
+		mat4 proj = perspective(radians(45.0f), (float)(SCR_WIDTH / SCR_HEIGHT), 0.1f, 1000.0f); 
+		// Moving the model around:
+		mat4 model = mat4(1.0f);
 		rot += (float)((glfwGetTime() - prevTime) * speed);
 		prevTime = glfwGetTime();
-		mat4 trans = mat4(1.0f);
-		trans = rotate(trans, rot, vec3(0.3f, 0.5f, 0.2f));
-		unsigned int transLoc = glGetUniformLocation(program.ID, "transform");
-		glUniformMatrix4fv(transLoc, 1, GL_FALSE, value_ptr(trans));
+		model = translate(model, vec3(0.0f, cos(rot), sin(rot)));
+		// Moving the camera:
+		mat4 view = mat4(1.0f);
+		view = translate(view, vec3(0.0f, 0.0f, -10.0f));
+
+		program.setMat4("proj", proj);
+		program.setMat4("model", model);
+		program.setMat4("view", view);
 
 		glDrawElements(GL_TRIANGLES, vao.indices.size(), GL_UNSIGNED_INT, NULL);
 
@@ -113,6 +121,8 @@ int main()
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	SCR_HEIGHT = height;
+	SCR_WIDTH = width;
 	glViewport(0, 0, width, height);
 }
 
@@ -120,7 +130,7 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		speed += 0.01f * speed;
+		speed += 0.001f * speed;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		speed -= 0.01f * speed;
+		speed -= 0.001f * speed;
 }
