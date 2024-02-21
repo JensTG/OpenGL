@@ -11,6 +11,7 @@
 #include <VAO.h>
 #include <renderfuncs.h>
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
@@ -78,7 +79,7 @@ int main()
 	vec2 worldSize = vec2(10.0f, 10.0f);
 	program.setVec2("worldSize", worldSize);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	VAO vao2("cube");
 
 	// -------------------- Rendering --------------------
 	while (!glfwWindowShouldClose(window))
