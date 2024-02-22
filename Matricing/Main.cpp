@@ -28,21 +28,38 @@ int SCR_HEIGHT = 600;
 
 vector<float> vertices =
 {
-	-0.8f,  0.5f,  0.0f,
-	 0.5f, -0.7f,  0.0f,
-	-0.5f, -0.5f,  0.0f,
-	 0.9f,  1.0f,  0.0f
+	-0.5, -0.5, -0.5,
+	 0.5, -0.5, -0.5,
+	 0.5,  0.5, -0.5,
+	-0.5,  0.5, -0.5,
+	-0.5, -0.5,  0.5,
+	 0.5, -0.5,  0.5,
+	 0.5,  0.5,  0.5,
+	-0.5,  0.5,  0.5
 };
 vector<unsigned int> indices =
 {
-	0, 1, 2,
-	3, 1, 0
+	0, 1, 5,
+	0, 5, 4,
+
+	1, 2, 6,
+	1, 6, 5,
+
+	2, 3, 7,
+	2, 7, 6,
+
+	3, 0, 4,
+	3, 4, 7,
+
+	4, 5, 6,
+	4, 6, 7,
+
+	1, 0, 3,
+	1, 3, 2
 };
 float speed = 1;
 float rot = 0;
 double prevTime = 0;
-
-vector<VAO> vaos;
 
 int main()
 {
@@ -76,10 +93,37 @@ int main()
 	VAO vao(vertices, indices);
 	program.use();
 
-	vec2 worldSize = vec2(10.0f, 10.0f);
-	program.setVec2("worldSize", worldSize);
-
 	VAO vao2("cube");
+
+	unsigned int texture;
+	glGenTextures(1, &texture);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// load and generate the texture
+	stbi_set_flip_vertically_on_load(true);
+	int width; int height; int nrChannels;
+	unsigned char* data = stbi_load("C:/VSC_PRO_B/OpenGL/resources/textures/red_brick_wall.jpg", &width, &height, &nrChannels, STBI_rgb_alpha);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// -------------------- Rendering --------------------
 	while (!glfwWindowShouldClose(window))
@@ -89,7 +133,7 @@ int main()
 
 		// Render:
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		program.use();
 		vao.bind();
@@ -100,14 +144,17 @@ int main()
 		mat4 model = mat4(1.0f);
 		rot += (float)((glfwGetTime() - prevTime) * speed);
 		prevTime = glfwGetTime();
-		model = translate(model, vec3(0.0f, cos(rot), sin(rot)));
+		model = rotate(model, (float)glfwGetTime() * radians(40.0f), vec3(0.5f, 1.0f, 0.0f));
 		// Moving the camera:
 		mat4 view = mat4(1.0f);
-		view = translate(view, vec3(0.0f, 0.0f, -10.0f));
+		view = translate(view, vec3(0.0f, 0.0f, -5.0f));
 
 		program.setMat4("proj", proj);
 		program.setMat4("model", model);
 		program.setMat4("view", view);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glDrawElements(GL_TRIANGLES, vao.indices.size(), GL_UNSIGNED_INT, NULL);
 

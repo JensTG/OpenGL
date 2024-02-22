@@ -64,8 +64,8 @@ int main()
     glGenBuffers(1, &EBO);
 
     Shader program(
-        "C:/VSC_PRO_B/OpenGL/resources/Shaders/textureVertex.txt",
-        "C:/VSC_PRO_B/OpenGL/resources/Shaders/textureFragment.txt"
+        "texture",
+        "texture"
     );
 
     glBindVertexArray(VAO);
