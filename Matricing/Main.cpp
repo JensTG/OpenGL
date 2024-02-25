@@ -9,7 +9,6 @@
 
 #include <shader.h>
 #include <VAO.h>
-#include <renderfuncs.h>
 
 #include <algorithm>
 #include <iostream>
@@ -90,10 +89,9 @@ int main()
 	}
 
 	Shader program("uniform", "ourColor");
-	VAO vao(vertices, indices);
+	cout << endl;
+	VAO cube("cube");
 	program.use();
-
-	VAO vao2("cube");
 
 	unsigned int texture;
 	glGenTextures(1, &texture);
@@ -134,29 +132,34 @@ int main()
 		// Render:
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		program.use();
-		vao.bind();
 
 		// Creating a projection:
-		mat4 proj = perspective(radians(45.0f), (float)(SCR_WIDTH / SCR_HEIGHT), 0.1f, 1000.0f); 
-		// Moving the model around:
-		mat4 model = mat4(1.0f);
-		rot += (float)((glfwGetTime() - prevTime) * speed);
-		prevTime = glfwGetTime();
-		model = rotate(model, (float)glfwGetTime() * radians(40.0f), vec3(0.5f, 1.0f, 0.0f));
+		mat4 proj = perspective(radians(45.0f), SCR_HEIGHT > 0 ? (float)(SCR_WIDTH / SCR_HEIGHT) : 1, 0.1f, 1000.0f);
 		// Moving the camera:
 		mat4 view = mat4(1.0f);
-		view = translate(view, vec3(0.0f, 0.0f, -5.0f));
+		view = translate(view, vec3(0.0f, 0.0f, -15.0f));
 
 		program.setMat4("proj", proj);
-		program.setMat4("model", model);
 		program.setMat4("view", view);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		for (int i = 0; i < 6; i++)
+		{
+			// Moving the model around:
+			mat4 model = mat4(1.0f);
+			model = translate(model, vec3(i - 3, (float)i / 2, -5.0f));
+			model = rotate(model, (float)glfwGetTime() * radians(20.0f), vec3(1.0f, 0.0f, 0.0f));
+			model = scale(model, vec3(1.0f, i + 1, 1.0f));
 
-		glDrawElements(GL_TRIANGLES, vao.indices.size(), GL_UNSIGNED_INT, NULL);
+			program.setMat4("model", model);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture);
+
+			glDrawElements(GL_TRIANGLES, cube.nInd, GL_UNSIGNED_INT, NULL);
+		}
+
 
 		// Bufferswap and polling:
 		glfwSwapBuffers(window);
