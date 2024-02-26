@@ -1,14 +1,7 @@
 #include <glad/glad.h>
 #include <glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#include <shader.h>
-#include <VAO.h>
+#include <rendering.h>
 
 #include <algorithm>
 #include <iostream>
@@ -25,40 +18,7 @@ void processInput(GLFWwindow* window);
 int SCR_WIDTH = 800;
 int SCR_HEIGHT = 600;
 
-vector<float> vertices =
-{
-	-0.5, -0.5, -0.5,
-	 0.5, -0.5, -0.5,
-	 0.5,  0.5, -0.5,
-	-0.5,  0.5, -0.5,
-	-0.5, -0.5,  0.5,
-	 0.5, -0.5,  0.5,
-	 0.5,  0.5,  0.5,
-	-0.5,  0.5,  0.5
-};
-vector<unsigned int> indices =
-{
-	0, 1, 5,
-	0, 5, 4,
-
-	1, 2, 6,
-	1, 6, 5,
-
-	2, 3, 7,
-	2, 7, 6,
-
-	3, 0, 4,
-	3, 4, 7,
-
-	4, 5, 6,
-	4, 6, 7,
-
-	1, 0, 3,
-	1, 3, 2
-};
 float speed = 1;
-float rot = 0;
-double prevTime = 0;
 
 int main()
 {
