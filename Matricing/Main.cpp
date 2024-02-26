@@ -1,7 +1,11 @@
 #include <glad/glad.h>
 #include <glfw3.h>
 
-#include <rendering.h>
+#include <VAO.h>
+#include <shader.h>
+#include <map.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #include <algorithm>
 #include <iostream>
@@ -50,7 +54,7 @@ int main()
 
 	Shader program("uniform", "ourColor");
 	cout << endl;
-	VAO cube("cube");
+	VAO cube("C:/VSC_PRO_B/OpenGL/resources/shapes/cube");
 	program.use();
 
 	unsigned int texture;
