@@ -24,6 +24,11 @@ int SCR_HEIGHT = 600;
 
 float speed = 1;
 
+float turnHor = 0.0f;
+float turnVer = 0.0f;
+vec3 camera = vec3(0.0f, 0.0f, 6.0f);
+float zoom = 1.0f;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -76,14 +81,16 @@ int main()
 		// Creating a projection:
 		mat4 proj = perspective(radians(45.0f), SCR_HEIGHT > 0 ? (float)(SCR_WIDTH / SCR_HEIGHT) : 1, 0.1f, 1000.0f);
 		program.setMat4("proj", proj);
+
 		// Moving the camera:
 		mat4 view = mat4(1.0f);
-		view = translate(view, vec3(0.0f, 0.0f, -15.0f));
+		view = translate(view, camera * vec3(sin(turnHor), 0.0f, cos(turnHor)));
+		view = rotate(view, -turnHor, vec3(0.0f, 1.0f, 0.0f));
+		view = scale(view, vec3(zoom, zoom, zoom));
 		program.setMat4("view", view);
 
 		// Moving the model around:
 		mat4 model = mat4(1.0f);
-		model = rotate(model, (float)glfwGetTime() * radians(10.0f), vec3(1.0f, 1.0f, 0.0f));
 		program.setMat4("model", model);
 
 		for (int i = 0; i < cubes.size(); i++)
@@ -113,7 +120,19 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		speed += 0.001f * speed;
+		camera -= 0.1f * vec3((float)sin(turnHor), 0.0f, (float)cos(turnHor));
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		speed -= 0.001f * speed;
+		camera += 0.1f * vec3((float)sin(turnHor), 0.0f, (float)cos(turnHor));
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		turnHor += 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		turnHor -= 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.y += 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		camera.y -= 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+		zoom += 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+		zoom -= 0.01f;
 }
