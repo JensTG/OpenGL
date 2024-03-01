@@ -16,18 +16,22 @@ using namespace std;
 using namespace glm;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, float deltaTime);
 
 // settings
 int SCR_WIDTH = 800;
 int SCR_HEIGHT = 600;
 
-float speed = 1;
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
 
-float turnHor = 0.0f;
-float turnVer = 0.0f;
-vec3 camera = vec3(0.0f, 0.0f, 6.0f);
-float zoom = 1.0f;
+vec3 cPos = vec3(0.0f, 0.0f, 6.0f);
+vec3 cFront = vec3(0.0f, 0.0f, -1.0f);
+vec3 cUp = vec3(0.0f, 1.0f, 0.0f);
+
+float cYaw = 270.0f;
+float cPitch = 0.0f;
+float cRoll = 0.0f;
 
 int main()
 {
@@ -70,8 +74,11 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// Input:
-		processInput(window);
-
+		float currentTime = glfwGetTime();
+		deltaTime = lastTime - currentTime;
+		lastTime = currentTime;
+		processInput(window, deltaTime);
+		
 		// Render:
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -84,9 +91,7 @@ int main()
 
 		// Moving the camera:
 		mat4 view = mat4(1.0f);
-		view = translate(view, camera * vec3(sin(turnHor), 0.0f, cos(turnHor)));
-		view = rotate(view, -turnHor, vec3(0.0f, 1.0f, 0.0f));
-		view = scale(view, vec3(zoom, zoom, zoom));
+		view = lookAt(cPos, cPos + cFront, cUp);
 		program.setMat4("view", view);
 
 		// Moving the model around:
@@ -98,7 +103,6 @@ int main()
 			cubes[i].bind();
 			glDrawElements(GL_TRIANGLES, cubes[i].nInd, GL_UNSIGNED_INT, NULL);
 		}
-
 
 		// Bufferswap and polling:
 		glfwSwapBuffers(window);
@@ -116,23 +120,30 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, float deltaTime) {
+	float cSpeed = 1.0f * deltaTime;
+	float cLook = 1.0f * deltaTime;
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cPos -= cFront * cSpeed;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cPos += cFront * cSpeed;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cPos += normalize(cross(cFront, cUp)) * cSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cPos -= normalize(cross(cFront, cUp)) * cSpeed;
+
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		camera -= 0.1f * vec3((float)sin(turnHor), 0.0f, (float)cos(turnHor));
+		cPitch -= cPitch > -89 ? cLook : 0;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		camera += 0.1f * vec3((float)sin(turnHor), 0.0f, (float)cos(turnHor));
+		cPitch += cPitch < 89 ? cLook : 0;
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		turnHor += 0.1f;
+		cYaw += cLook;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		turnHor -= 0.1f;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.y += 0.01f;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		camera.y -= 0.01f;
-	if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
-		zoom += 0.01f;
-	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
-		zoom -= 0.01f;
+		cYaw -= cLook;
+
+	cFront = vec3(cos(cYaw) * cos(cPitch), sin(cPitch), sin(cYaw) * cos(cPitch));
 }
