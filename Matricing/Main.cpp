@@ -29,7 +29,7 @@ vec3 cPos = vec3(0.0f, 0.0f, 6.0f);
 vec3 cFront = vec3(0.0f, 0.0f, -1.0f);
 vec3 cUp = vec3(0.0f, 1.0f, 0.0f);
 
-float cYaw = 270.0f;
+float cYaw = -90.0f;
 float cPitch = 0.0f;
 float cRoll = 0.0f;
 
@@ -122,7 +122,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void processInput(GLFWwindow* window, float deltaTime) {
 	float cSpeed = 1.0f * deltaTime;
-	float cLook = 1.0f * deltaTime;
+	float cLook = 15.0f * deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -135,15 +135,22 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		cPos += normalize(cross(cFront, cUp)) * cSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cPos -= normalize(cross(cFront, cUp)) * cSpeed;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		cPos -= normalize(cross(cross(cFront, cUp), cFront)) * cSpeed;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		cPos += normalize(cross(cross(cFront, cUp), cFront)) * cSpeed;
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		cPitch -= cPitch > -89 ? cLook : 0;
+		cPitch -= cLook;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		cPitch += cPitch < 89 ? cLook : 0;
+		cPitch += cLook;
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		cYaw += cLook;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		cYaw -= cLook;
 
-	cFront = vec3(cos(cYaw) * cos(cPitch), sin(cPitch), sin(cYaw) * cos(cPitch));
+	cPitch = cPitch < -89.0f ? -89.0f : cPitch;
+	cPitch = cPitch > 89.0f ? 89.0f : cPitch;
+
+	cFront = vec3(cos(radians(cYaw)) * cos(radians(cPitch)), sin(radians(cPitch)), sin(radians(cYaw)) * cos(radians(cPitch)));
 }
