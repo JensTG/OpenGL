@@ -65,6 +65,10 @@ int main()
 	cout << endl;
 	program.use();
 
+	// Establishing the model mat4:
+	mat4 model = mat4(1.0f);
+	program.setMat4("model", model);
+
 	vector<VAO> cubes = readCollection("C:/VSC_PRO_B/OpenGL/resources/collections/proof.col");
 
 	glEnable(GL_DEPTH_TEST);
@@ -94,13 +98,10 @@ int main()
 		view = lookAt(cPos, cPos + cFront, cUp);
 		program.setMat4("view", view);
 
-		// Moving the model around:
-		mat4 model = mat4(1.0f);
-		program.setMat4("model", model);
-
 		for (int i = 0; i < cubes.size(); i++)
 		{
 			cubes[i].bind();
+			cubes[i].applyTransform(program);
 			glDrawElements(GL_TRIANGLES, cubes[i].nInd, GL_UNSIGNED_INT, NULL);
 		}
 
