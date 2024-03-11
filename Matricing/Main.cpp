@@ -4,6 +4,7 @@
 #include <VAO.h>
 #include <shader.h>
 #include <map.h>
+#include <camera.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -25,13 +26,7 @@ int SCR_HEIGHT = 600;
 float deltaTime = 0.0f;
 float lastTime = 0.0f;
 
-vec3 cPos = vec3(0.0f, 0.0f, 6.0f);
-vec3 cFront = vec3(0.0f, 0.0f, -1.0f);
-vec3 cUp = vec3(0.0f, 1.0f, 0.0f);
-
-float cYaw = -90.0f;
-float cPitch = 0.0f;
-float cRoll = 0.0f;
+camera cam(15.0f, 1.0f);
 
 int main()
 {
@@ -61,7 +56,7 @@ int main()
 		return -1;
 	}
 
-	Shader program("uniform", "uniform");
+	Shader program("uniform", "ourColor");
 	cout << endl;
 	program.use();
 
@@ -70,7 +65,6 @@ int main()
 	program.setMat4("model", model);
 
 	vector<VAO> cubes = readCollection("C:/VSC_PRO_B/OpenGL/resources/collections/proof.col");
-	for (int i = 0; i < cubes.size(); i++) cubes[i].attachTexture("C:/VSC_PRO_B/OpenGL/resources/shapes/cube");
 
 	glEnable(GL_DEPTH_TEST);
 	
@@ -120,9 +114,7 @@ int main()
 		program.setMat4("proj", proj);
 
 		// Moving the camera:
-		mat4 view = mat4(1.0f);
-		view = lookAt(cPos, cPos + cFront, cUp);
-		program.setMat4("view", view);
+		program.setMat4("view", cam.calculate());
 
 		for (int i = 0; i < cubes.size(); i++)
 		{
@@ -148,36 +140,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void processInput(GLFWwindow* window, float deltaTime) {
-	float cSpeed = 1.0f * deltaTime;
-	float cLook = 15.0f * deltaTime;
-
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cPos -= cFront * cSpeed;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cPos += cFront * cSpeed;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cPos += normalize(cross(cFront, cUp)) * cSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cPos -= normalize(cross(cFront, cUp)) * cSpeed;
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		cPos -= normalize(cross(cross(cFront, cUp), cFront)) * cSpeed;
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		cPos += normalize(cross(cross(cFront, cUp), cFront)) * cSpeed;
-
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		cPitch -= cLook;
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		cPitch += cLook;
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		cYaw += cLook;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		cYaw -= cLook;
-
-	cPitch = cPitch < -89.0f ? -89.0f : cPitch;
-	cPitch = cPitch > 89.0f ? 89.0f : cPitch;
-
-	cFront = vec3(cos(radians(cYaw)) * cos(radians(cPitch)), sin(radians(cPitch)), sin(radians(cYaw)) * cos(radians(cPitch)));
+	cam.takeKeyLook(window, deltaTime);
+	cam.takeMovement(window, deltaTime);
 }
