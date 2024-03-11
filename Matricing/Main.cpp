@@ -27,6 +27,7 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 
 camera cam(15.0f, 1.0f);
+vector<VAO> points;
 
 int main()
 {
@@ -64,8 +65,6 @@ int main()
 	mat4 model = mat4(1.0f);
 	program.setMat4("model", model);
 
-	vector<VAO> cubes = readCollection("C:/VSC_PRO_B/OpenGL/resources/collections/proof.col");
-
 	glEnable(GL_DEPTH_TEST);
 
 	// -------------------- Rendering --------------------
@@ -90,11 +89,11 @@ int main()
 		// Moving the camera:
 		program.setMat4("view", cam.calculate());
 
-		for (int i = 0; i < cubes.size(); i++)
+		for (int i = 0; i < points.size(); i++)
 		{
-			cubes[i].bind();
-			cubes[i].applyTransform(program);
-			glDrawElements(GL_TRIANGLES, cubes[i].nInd, GL_UNSIGNED_INT, NULL);
+			points[i].bind();
+			points[i].applyTransform(program);
+			glDrawElements(GL_TRIANGLES, points[i].nInd, GL_UNSIGNED_INT, NULL);
 		}
 
 		// Bufferswap and polling:
@@ -114,9 +113,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void processInput(GLFWwindow* window, float deltaTime) {
+	float speedMul = 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		speedMul = 2.0f;
 
-	cam.takeKeyLook(window, deltaTime);
-	cam.takeMovement(window, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		points.push_back(VAO("cube", scale(translate(mat4(1.0f), cam.cPos), vec3(1.0f))));
+
+	cam.takeKeyLook(window, deltaTime * speedMul);
+	cam.takeMovement(window, deltaTime * speedMul);
 }
