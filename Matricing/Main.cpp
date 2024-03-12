@@ -59,7 +59,6 @@ int main()
 	}
 
 	Shader program("uniform", "ourColor");
-	cout << endl;
 	program.use();
 
 	// Establishing the model mat4:

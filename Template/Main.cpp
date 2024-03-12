@@ -1,19 +1,33 @@
 #include <glad/glad.h>
 #include <glfw3.h>
 
-#include <iostream>
-#include <vector>
+#include <VAO.h>
 #include <shader.h>
+#include <map.h>
+#include <camera.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
+using namespace glm;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, float deltaTime);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+int SCR_WIDTH = 800;
+int SCR_HEIGHT = 600;
+
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
+
+camera cam(15.0f, 1.0f);
+bool keysHeld[GLFW_KEY_LAST + 1];
 
 int main()
 {
@@ -43,6 +57,14 @@ int main()
         return -1;
     }
 
+    Shader program("", "");
+
+    // Establishing the model mat4:
+    mat4 model = mat4(1.0f);
+    program.setMat4("model", model);
+
+    glEnable(GL_DEPTH_TEST);
+
     // -------------------- Rendering --------------------
     while (!glfwWindowShouldClose(window))
     {
@@ -64,6 +86,8 @@ int main()
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    SCR_HEIGHT = height;
+    SCR_WIDTH = width;
     glViewport(0, 0, width, height);
 }
 
