@@ -28,6 +28,7 @@ float lastTime = 0.0f;
 
 camera cam(15.0f, 1.0f);
 vector<VAO> points;
+bool keysHeld[GLFW_KEY_LAST + 1];
 
 int main()
 {
@@ -120,7 +121,14 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		speedMul = 2.0f;
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		points.push_back(VAO("cube", scale(translate(mat4(1.0f), cam.cPos), vec3(1.0f))));
+	{
+		if (!keysHeld[GLFW_KEY_SPACE])
+		{
+			points.push_back(VAO("C:/VSC_PRO_B/OpenGL/resources/shapes/cube", scale(rotate(translate(mat4(1.0f), cam.cPos), acos(dot(vec3(0, 0, 1), cam.cFront)), normalize(cam.cFront)), vec3(0.1f))));
+			keysHeld[GLFW_KEY_SPACE] = true;
+		}
+	}
+	else keysHeld[GLFW_KEY_SPACE] = false;
 
 	cam.takeKeyLook(window, deltaTime * speedMul);
 	cam.takeMovement(window, deltaTime * speedMul);
