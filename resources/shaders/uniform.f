@@ -2,14 +2,17 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 in vec4 ourColor;
-in vec2 TexCoord;
+
+uniform vec3 objectColor;
+uniform vec3 lightColor;
 
 out vec4 FragColor;
 
-uniform sampler2D texture1;
-uniform vec3 uniformColor;
-
 void main()
 {
-    FragColor = ourColor;
+    float ambientStrength = 0.1;
+    vec3 ambient = lightColor * ambientStrength;
+
+    vec3 result = ambient * objectColor;
+    FragColor = vec4(result, 1.0f);
 }

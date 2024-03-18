@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Matricing", "Matricing\Matr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyOwnVAO", "MyOwnVAO\MyOwnVAO.vcxproj", "{A89F72F2-15FD-4E93-BC6E-C6632F60ABB3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Coloring", "Coloring\Coloring.vcxproj", "{8C689278-2564-45A4-BB66-3C085CD8CDCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{A89F72F2-15FD-4E93-BC6E-C6632F60ABB3}.Release|x64.Build.0 = Release|x64
 		{A89F72F2-15FD-4E93-BC6E-C6632F60ABB3}.Release|x86.ActiveCfg = Release|Win32
 		{A89F72F2-15FD-4E93-BC6E-C6632F60ABB3}.Release|x86.Build.0 = Release|Win32
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Debug|x64.ActiveCfg = Debug|x64
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Debug|x64.Build.0 = Debug|x64
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Debug|x86.ActiveCfg = Debug|Win32
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Debug|x86.Build.0 = Debug|Win32
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Release|x64.ActiveCfg = Release|x64
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Release|x64.Build.0 = Release|x64
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Release|x86.ActiveCfg = Release|Win32
+		{8C689278-2564-45A4-BB66-3C085CD8CDCE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
