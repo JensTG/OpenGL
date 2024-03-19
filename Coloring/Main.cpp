@@ -61,12 +61,16 @@ int main()
         return -1;
     }
 
+    Shader lSource("uniform", "source");
     Shader program("uniform", "uniform");
+    lSource.use();
     program.use();
 
-    shapes = readCollection("C:\\VSC_PRO_B\\OpenGL\\resources\\collections\\lightroom.col");
+    shapes = readCollection("lightroom");
     shapes[0].color = objectColor;
     shapes[1].color = lightColor;
+    shapes[0].program = program;
+    shapes[1].program = lSource;
 
     // Establishing the model mat4:
     mat4 model = mat4(1.0f);
@@ -96,13 +100,14 @@ int main()
         // Moving the camera:
         program.setMat4("view", cam.calculate());
 
-        for (int i = 0; i < shapes.size(); i++)
+        for (VAO shape : shapes)
         {
-            shapes[i].bind();
-            shapes[i].applyTransform(program);
-            program.setVec3("objectColor", shapes[i].color);
-            program.setVec3("lightColor", lightColor);
-            glDrawElements(GL_TRIANGLES, shapes[i].nInd, GL_UNSIGNED_INT, NULL);
+            shape.bind();
+            shape.program.use();
+            shape.applyTransform();
+            shape.program.setVec3("objectColor", shape.color);
+            shape.program.setVec3("lightColor", lightColor);
+            glDrawElements(GL_TRIANGLES, shape.nInd, GL_UNSIGNED_INT, NULL);
         }
 
         // Bufferswap and polling:
