@@ -91,17 +91,17 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        program.use();
-
-        // Creating a projection:
-        mat4 proj = perspective(radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-        program.setMat4("proj", proj);
-
-        // Moving the camera:
-        program.setMat4("view", cam.calculate());
+        mat4 view = cam.calculate();
 
         for (VAO shape : shapes)
         {
+            // Creating a projection:
+            mat4 proj = perspective(radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+            shape.program.setMat4("proj", proj);
+
+            // Moving the camera:
+            shape.program.setMat4("view", view);
+
             shape.bind();
             shape.program.use();
             shape.applyTransform();
