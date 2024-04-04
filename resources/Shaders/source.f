@@ -1,11 +1,7 @@
 #version 330 core
-#extension GL_ARB_separate_shader_objects : enable
-
-uniform vec3 lightColor;
-
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(lightColor, 1.0f);
+    FragColor = vec4(1.0); // set all 4 vector values to 1.0
 }

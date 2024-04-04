@@ -5,9 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <light.h>
 #include <shader.h>
 #include <camera.h>
-
 #include <model.h>
 #include <iostream>
 
@@ -31,7 +31,11 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+vector<DirectLight> dLights;
+vector<PointLight> pLights;
+vector<SpotLight> sLights;
+
+DirectLight sun = {glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f)};
 
 int main()
 {
@@ -77,8 +81,8 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader lightingShader("material", "material");
-    Shader lightCubeShader("source", "source");
+    Shader lightingShader("material", "lightTest");
+    lightingShader.use();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -158,9 +162,8 @@ int main()
 
     unsigned int diffuseMap = TextureFromFile("container2.png", string("C:/VSC_PRO_B/OpenGL/resources/Textures"));
     unsigned int specularMap = TextureFromFile("container2_specular.png", string("C:/VSC_PRO_B/OpenGL/resources/Textures"));
-    lightingShader.use();
-    lightingShader.setInt("material.diffuse", 0);
-    lightingShader.setInt("material.specular", 1);
+
+    dLights.push_back(sun);
 
     // render loop
     // -----------
@@ -183,18 +186,17 @@ int main()
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
-        lightingShader.setVec3("light.position", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
 
         // light properties
-        glm::vec3 lightColor = glm::vec3(1.0f);
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-        lightingShader.setVec3("light.ambient", ambientColor);
-        lightingShader.setVec3("light.diffuse", diffuseColor);
-        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("dLight.direction", sun.direction);
+        lightingShader.setVec3("dLight.ambient", sun.ambient);
+        lightingShader.setVec3("dLight.diffuse", sun.diffuse);
+        lightingShader.setVec3("dLight.specular", sun.specular);
 
         // material properties
+        lightingShader.setInt("material.diffuse", 0);
+        lightingShader.setInt("material.specular", 1);
         lightingShader.setFloat("material.shininess", 64.0f);
 
         // view/projection transformations
@@ -217,19 +219,6 @@ int main()
         // render the cube
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // also draw the lamp object
-        lightCubeShader.use();
-        lightCubeShader.setMat4("projection", projection);
-        lightCubeShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lightCubeShader.setMat4("model", model);
-
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
