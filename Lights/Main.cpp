@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,7 +8,10 @@
 #include <shader.h>
 #include <camera.h>
 #include <model.h>
+
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -31,11 +33,27 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-vector<DirectLight> dLights;
-vector<PointLight> pLights;
-vector<SpotLight> sLights;
+DirectLight sun = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0, 0, 0.2f), glm::vec3(0.0f, 0.0f, 0.8f), glm::vec3(1.0f) };
+SpotLight flash = { glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f), glm::cos(glm::radians(5.0f)), glm::cos(glm::radians(7.0f)) };
+PointLight lamp = { glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.1f), glm::vec3(1.0, 0.0f, 0.0f), glm::vec3(1.0f), 1, 0.10f, 0.08f };
 
-DirectLight sun = {glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f)};
+vector<DirectLight*> dLights = { &sun };
+vector<PointLight*> pLights = { &lamp };
+vector<SpotLight*> sLights = { &flash };
+
+// cubes
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
 
 int main()
 {
@@ -150,20 +168,14 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    unsigned int lightCubeVAO;
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // texturing
     unsigned int diffuseMap = TextureFromFile("container2.png", string("C:/VSC_PRO_B/OpenGL/resources/Textures"));
     unsigned int specularMap = TextureFromFile("container2_specular.png", string("C:/VSC_PRO_B/OpenGL/resources/Textures"));
-
-    dLights.push_back(sun);
 
     // render loop
     // -----------
@@ -188,11 +200,10 @@ int main()
         lightingShader.use();
         lightingShader.setVec3("viewPos", camera.Position);
 
-        // light properties
-        lightingShader.setVec3("dLight.direction", sun.direction);
-        lightingShader.setVec3("dLight.ambient", sun.ambient);
-        lightingShader.setVec3("dLight.diffuse", sun.diffuse);
-        lightingShader.setVec3("dLight.specular", sun.specular);
+        flash.position = camera.Position;
+        flash.direction = camera.Front;
+
+        applyLights(dLights, pLights, sLights, lightingShader);
 
         // material properties
         lightingShader.setInt("material.diffuse", 0);
@@ -205,10 +216,6 @@ int main()
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-        // world transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        lightingShader.setMat4("model", model);
-
         // Bind textures:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -218,7 +225,16 @@ int main()
 
         // render the cube
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (int i = 0; i < 5; i++) {
+            // world transformation
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(cubePositions[i]));
+            model = glm::rotate(model, glm::radians(15.0f * i), glm::vec3(0.4f, 0.1f, 0.8f));
+            lightingShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -229,7 +245,6 @@ int main()
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightCubeVAO);
     glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -253,6 +268,10 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
