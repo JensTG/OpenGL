@@ -15,6 +15,8 @@ struct DirectLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float strength;
 };
 struct PointLight {
     vec3 position;
@@ -26,6 +28,8 @@ struct PointLight {
     float constant;
     float linear;
     float quadratic;
+
+    float strength;
 };
 struct SpotLight {
     vec3 ambient;
@@ -36,6 +40,8 @@ struct SpotLight {
     vec3 direction;
     float cutOff;
     float outerCutOff;
+
+    float strength;
 };
 
 in vec2 TexCoords;
@@ -61,7 +67,7 @@ vec3 calcDirLight(DirectLight light, vec3 norm, vec3 viewDir){
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
 
-    return (ambient + diffuse + specular);
+    return (light.strength * (ambient + diffuse + specular));
 }
 
 vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir) {
@@ -78,7 +84,7 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir) {
     vec3 diffuse = light.diffuse * attenuation * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * attenuation * spec * vec3(texture(material.specular, TexCoords)); 
     
-    return max((ambient + diffuse + specular), 0.0);
+    return max((light.strength * (ambient + diffuse + specular)), 0.0);
 }
 
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir) {
@@ -96,7 +102,7 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir) {
     vec3 diffuse = light.diffuse * intensity * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * intensity * spec * vec3(texture(material.specular, TexCoords)); 
 
-    return (ambient + diffuse + specular);
+    return (light.strength * (ambient + diffuse + specular));
 }
 
 void main()

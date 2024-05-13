@@ -34,7 +34,7 @@ float lastFrame = 0.0f;
 
 // lighting
 DirectLight sun = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0, 0, 0.2f), glm::vec3(0.0f, 0.0f, 0.8f), glm::vec3(1.0f) };
-SpotLight flash = { glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f), glm::cos(glm::radians(5.0f)), glm::cos(glm::radians(7.0f)) };
+SpotLight flash = { glm::vec3(0.1f), glm::vec3(1.0f), glm::vec3(1.0f), glm::cos(glm::radians(5.0f)), glm::cos(glm::radians(7.0f)), 1.0f, glm::vec3(0.0f), glm::vec3(0.0f)};
 PointLight lamp = { glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.1f), glm::vec3(1.0, 0.0f, 0.0f), glm::vec3(1.0f), 1, 0.10f, 0.08f };
 
 vector<DirectLight*> dLights = { &sun };
